@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT;
@@ -25,7 +25,11 @@ async function run() {
   try {
     // DB collections
     const eventsCollection = client.db("Event-360").collection("events");
+    const eventServicesCollection = client
+      .db("Event-360")
+      .collection("event-services");
 
+    // Events
     // Get all events
     app.get("/events", async (req, res) => {
       const allEvents = await eventsCollection.find().toArray();
@@ -37,6 +41,38 @@ async function run() {
       const addedEvent = req.body;
       const result = await eventsCollection.insertOne(addedEvent);
       res.send(result);
+    });
+
+    // Delete event by Id
+    app.delete("/events/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result3 = await eventsCollection.deleteOne(query);
+      res.send(result3);
+    });
+
+    // Event services
+    // Get all event services
+    app.get("/event-services", async (req, res) => {
+      const allEventServices = await eventServicesCollection.find().toArray();
+      res.send(allEventServices);
+    });
+
+    // Add a event service
+    app.post("/event-services", async (req, res) => {
+      const addedEventServices = req.body;
+      const result2 = await eventServicesCollection.insertOne(
+        addedEventServices
+      );
+      res.send(result2);
+    });
+
+    // Delete event service by Id
+    app.delete("/event-services/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result4 = await eventServicesCollection.deleteOne(query);
+      res.send(result4);
     });
 
     // Send a ping to confirm a successful connection
