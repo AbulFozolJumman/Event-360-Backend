@@ -51,6 +51,28 @@ async function run() {
       res.send(result);
     });
 
+    // Update event by Id
+    app.put("/events/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedEvent = req.body;
+      const query = { _id: new ObjectId(id) };
+
+      try {
+        const result = await eventsCollection.updateOne(query, {
+          $set: updatedEvent,
+        });
+        if (result.matchedCount === 0) {
+          return res.status(404).json({ error: "Event not found" });
+        }
+        res.json(result);
+      } catch (error) {
+        console.error("Error updating event:", error);
+        res
+          .status(500)
+          .json({ error: "Internal server error", message: error.message });
+      }
+    });
+
     // Delete event by Id
     app.delete("/events/:id", async (req, res) => {
       const id = req.params.id;
@@ -81,6 +103,28 @@ async function run() {
         addedEventServices
       );
       res.send(result);
+    });
+
+    // Update event service by Id
+    app.put("/event-services/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedEventService = req.body;
+      const query = { _id: new ObjectId(id) };
+
+      try {
+        const result = await eventServicesCollection.updateOne(query, {
+          $set: updatedEventService,
+        });
+        if (result.matchedCount === 0) {
+          return res.status(404).json({ error: "Event service not found" });
+        }
+        res.json(result);
+      } catch (error) {
+        console.error("Error updating event service:", error);
+        res
+          .status(500)
+          .json({ error: "Internal server error", message: error.message });
+      }
     });
 
     // Delete event service by Id
