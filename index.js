@@ -36,6 +36,14 @@ async function run() {
       res.send(allEvents);
     });
 
+    // Get event by ID
+    app.get("/events/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const event = await eventsCollection.findOne(query);
+      res.send(event);
+    });
+
     // Add a event
     app.post("/events", async (req, res) => {
       const addedEvent = req.body;
@@ -47,8 +55,8 @@ async function run() {
     app.delete("/events/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const result3 = await eventsCollection.deleteOne(query);
-      res.send(result3);
+      const result = await eventsCollection.deleteOne(query);
+      res.send(result);
     });
 
     // Event services
@@ -58,21 +66,29 @@ async function run() {
       res.send(allEventServices);
     });
 
+    // Get event service by ID
+    app.get("/event-services/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const eventService = await eventServicesCollection.findOne(query);
+      res.send(eventService);
+    });
+
     // Add a event service
     app.post("/event-services", async (req, res) => {
       const addedEventServices = req.body;
-      const result2 = await eventServicesCollection.insertOne(
+      const result = await eventServicesCollection.insertOne(
         addedEventServices
       );
-      res.send(result2);
+      res.send(result);
     });
 
     // Delete event service by Id
     app.delete("/event-services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const result4 = await eventServicesCollection.deleteOne(query);
-      res.send(result4);
+      const result = await eventServicesCollection.deleteOne(query);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
