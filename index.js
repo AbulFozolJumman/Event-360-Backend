@@ -25,11 +25,14 @@ async function run() {
   try {
     // DB collections
     const eventsCollection = client.db("Event-360").collection("events");
+    const eventItemsCollection = client
+      .db("Event-360")
+      .collection("event-items");
     const eventServicesCollection = client
       .db("Event-360")
       .collection("event-services");
 
-    // Events
+    // Events CRUD
     // Get all events
     app.get("/events", async (req, res) => {
       const allEvents = await eventsCollection.find().toArray();
@@ -81,7 +84,7 @@ async function run() {
       res.send(result);
     });
 
-    // Event services
+    // Event services CRUD
     // Get all event services
     app.get("/event-services", async (req, res) => {
       const allEventServices = await eventServicesCollection.find().toArray();
@@ -98,10 +101,8 @@ async function run() {
 
     // Add a event service
     app.post("/event-services", async (req, res) => {
-      const addedEventServices = req.body;
-      const result = await eventServicesCollection.insertOne(
-        addedEventServices
-      );
+      const addedEventService = req.body;
+      const result = await eventServicesCollection.insertOne(addedEventService);
       res.send(result);
     });
 
@@ -132,6 +133,58 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await eventServicesCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // Event items CRUD
+    // Get all event items
+    app.get("/event-items", async (req, res) => {
+      const allEventItems = await eventItemsCollection.find().toArray();
+      res.send(allEventItems);
+    });
+
+    // Get event item by ID
+    app.get("/event-items/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const eventItem = await eventItemsCollection.findOne(query);
+      res.send(eventItem);
+    });
+
+    // Add a event item
+    app.post("/event-items", async (req, res) => {
+      const addedEventItem = req.body;
+      const result = await eventItemsCollection.insertOne(addedEventItem);
+      res.send(result);
+    });
+
+    // Update event item by Id
+    app.put("/event-items/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedEventItem = req.body;
+      const query = { _id: new ObjectId(id) };
+
+      try {
+        const result = await eventItemsCollection.updateOne(query, {
+          $set: updatedEventItem,
+        });
+        if (result.matchedCount === 0) {
+          return res.status(404).json({ error: "Event item not found" });
+        }
+        res.json(result);
+      } catch (error) {
+        console.error("Error updating event item:", error);
+        res
+          .status(500)
+          .json({ error: "Internal server error", message: error.message });
+      }
+    });
+
+    // Delete event item by Id
+    app.delete("/event-items/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await eventItemsCollection.deleteOne(query);
       res.send(result);
     });
 
